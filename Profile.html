@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Security Alert</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            border: 2px solid #0f0;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.7; }
+        }
+        
+        .terminal {
+            border: 1px solid #0f0;
+            padding: 15px;
+            height: 400px;
+            overflow: hidden;
+        }
+        
+        .line {
+            margin: 5px 0;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            border: 1px solid #0f0;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #0f0;
+            width: 0%;
+            animation: fill 5s linear forwards;
+        }
+        
+        @keyframes fill {
+            to { width: 100%; }
+        }
+        
+        .warning {
+            color: #f00;
+            font-size: 24px;
+            text-align: center;
+            margin: 20px 0;
+            animation: pulse 0.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .glitch {
+            animation: glitch 0.3s infinite;
+        }
+        
+        @keyframes glitch {
+            0% { 
+                transform: translate(0);
+                filter: hue-rotate(0deg);
+            }
+            20% { 
+                transform: translate(-5px, 5px);
+                filter: hue-rotate(90deg);
+            }
+            40% { 
+                transform: translate(-5px, -5px);
+                filter: hue-rotate(180deg);
+            }
+            60% { 
+                transform: translate(5px, 5px);
+                filter: hue-rotate(270deg);
+            }
+            80% { 
+                transform: translate(5px, -5px);
+                filter: hue-rotate(360deg);
+            }
+            100% { 
+                transform: translate(0);
+                filter: hue-rotate(0deg);
+            }
+        }
+        
+        .rgb-glitch {
+            position: relative;
+        }
+        
+        .rgb-glitch::before,
+        .rgb-glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .rgb-glitch::before {
+            animation: glitch-1 0.3s infinite;
+            color: #ff00ff;
+            z-index: -1;
+        }
+        
+        .rgb-glitch::after {
+            animation: glitch-2 0.3s infinite;
+            color: #00ffff;
+            z-index: -2;
+        }
+        
+        @keyframes glitch-1 {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(-3px, -3px); }
+            60% { transform: translate(3px, 3px); }
+            80% { transform: translate(3px, -3px); }
+            100% { transform: translate(0); }
+        }
+        
+        @keyframes glitch-2 {
+            0% { transform: translate(0); }
+            20% { transform: translate(3px, -3px); }
+            40% { transform: translate(3px, 3px); }
+            60% { transform: translate(-3px, -3px); }
+            80% { transform: translate(-3px, 3px); }
+            100% { transform: translate(0); }
+        }
+        
+        .rainbow-glitch {
+            animation: rainbow 0.5s infinite;
+        }
+        
+        @keyframes rainbow {
+            0% { color: #ff0000; text-shadow: 0 0 10px #ff0000; }
+            16% { color: #ff7f00; text-shadow: 0 0 10px #ff7f00; }
+            32% { color: #ffff00; text-shadow: 0 0 10px #ffff00; }
+            48% { color: #00ff00; text-shadow: 0 0 10px #00ff00; }
+            64% { color: #0000ff; text-shadow: 0 0 10px #0000ff; }
+            80% { color: #8b00ff; text-shadow: 0 0 10px #8b00ff; }
+            100% { color: #ff0000; text-shadow: 0 0 10px #ff0000; }
+        }
+        
+        .glitch-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('data:image/png;base64,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روV5RxEC1oOZ4kh/IeeQjkd7aWMu+3rQjvbSxl329aOcq3L+SiQ69Y6vn5gQsgCNx5trY677etCPNtLHXfb1oitS3kokLYavfMCFj8w8xG4721sdd9vWhHe2tjrvt60VW5byUSEsNXvmBCyeYeYjcd7a2Ou+3rQjvbWx1329aIrUt5KJBYqvfMCFk8w8xG4721sdd9vWhHe2tjrvt60VW5byUSCxVe+YELJ5h5iNx3tpY677etCO9tbHXfb1oitS3kokLYavfMCFk8w8xG4721sdd9vWhHe2tjrvt60VW5byUSEsVXvmBCyeYeYjcdba2Ou+3LAjrbWx1325YCty3kokFiq98wIWTzDzEbjrbWx1325YEdba2Ou+3LAVuW8lEgsVXvmBCyeYeYjcdba2Ou+3LAjrbWx1325YCty3kokFiq98wIWTzDzEbjrbWx1325YEdba2Ou+3LBFalvJRILFV75gQsnmHmI3HW2tjrvtywI621sdd9uWCq3LeSiQthq98wIWTzDzEbjrbWx1325YEdba2Ou+3LAVuW8lEgsNXvmBCyeYeYjcd7a2Ot+3LAjrbWx1325YCty3kokJYqvfMCFk8w8xG4621sdd9uWBHW2tjrvtywFblvJRIWxVe+YFuLJ5h5iNx1trY677csCOttbHXfblgK3LeSiQliq98wIWTzDzEbjrbWx1325YEdba2Ou+3LAVuW8lEgsVXvmBCyeYeYjcdba2Ou+3LAjrbWx1325YCty3kokFiq98wIWTzDzEbjrbWx1325YEdba2Ou+3LAVuW8lEgsVXvmBCyeYeYjcdba2Ou+3LAjrbWx1325YIrUt5KJBYqvfM...< truncated 10532 characters >...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');
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transition: opacity 0.1s;
+        }
+        
+        .glitch-overlay.active {
+            opacity: 0.8;
+        }
+        
+        .scanline-glitch {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                #ff0000 0px,
+                #ff7f00 2px,
+                #ffff00 4px,
+                #00ff00 6px,
+                #00ffff 8px,
+                #0000ff 10px,
+                #ff00ff 12px,
+                #ff0000 14px
+            );
+            animation: scanlines 0.3s linear;
+        }
+        
+        @keyframes scanlines {
+            0% { 
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+            50% { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% { 
+                opacity: 0;
+                transform: translateY(100%);
+            }
+        }
+        
+        .static-glitch {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0;
+            background-image: 
+                repeating-linear-gradient(90deg, 
+                    rgba(255,0,0,0.8) 0px, 
+                    rgba(0,255,0,0.8) 1px, 
+                    rgba(0,0,255,0.8) 2px,
+                    rgba(255,255,0,0.8) 3px,
+                    rgba(255,0,255,0.8) 4px,
+                    rgba(0,255,255,0.8) 5px
+                ),
+                repeating-linear-gradient(0deg,
+                    rgba(255,0,0,0.5) 0px,
+                    rgba(0,255,0,0.5) 2px,
+                    rgba(0,0,255,0.5) 4px,
+                    rgba(255,255,0,0.5) 6px
+                );
+            animation: staticEffect 0.3s linear;
+        }
+        
+        @keyframes staticEffect {
+            0% { 
+                opacity: 0;
+            }
+            50% { 
+                opacity: 0.8;
+            }
+            100% { 
+                opacity: 0;
+            }
+        }
+        
+        .countdown {
+            font-size: 48px;
+            text-align: center;
+            color: #f00;
+            margin: 30px 0;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .camera-warning {
+            background: #f00;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 20px;
+            margin: 20px 0;
+            border: 3px solid #fff;
+            animation: pulse 0.5s infinite;
+            display: none;
+        }
+        
+        .reveal {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            font-size: 32px;
+            color: #fff;
+            animation: fadeIn 1s forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="glitch-overlay" id="glitchOverlay"></div>
+    <div class="scanline-glitch" id="scanlines"></div>
+    <div class="static-glitch" id="static"></div>
+    
+    <div class="container">
+        <div class="header rgb-glitch" data-text="⚠️ SECURITY BREACH DETECTED ⚠️">
+            <h1>⚠️ SECURITY BREACH DETECTED ⚠️</h1>
+        </div>
+        
+        <div class="terminal" id="terminal"></div>
+        
+        <div class="camera-warning" id="camera">
+            🔴 CAMERA ACTIVATED - RECORDING IN PROGRESS 🔴
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        
+        <div class="warning" id="warning">
+            DOWNLOADING FILES...
+        </div>
+        
+        <div class="countdown" id="countdown">
+            SELF-DESTRUCT IN: <span id="timer">10</span>
+        </div>
+        
+        <div class="reveal" id="reveal">
+            💾 FULL DISK WIPED<br>
+            ALL DATA SENT TO: i_paulthegreat 💾
+        </div>
+    </div>
+
+    <script>
+        // Fullscreen with 4-click escape requirement
+        let escapeClicks = 0;
+        const REQUIRED_CLICKS = 4;
+        
+        function goFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(() => {});
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+        
+        // Block escape attempts
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement && escapeClicks < REQUIRED_CLICKS) {
+                escapeClicks++;
+                setTimeout(goFullscreen, 100);
+            }
+        });
+        
+        document.addEventListener('webkitfullscreenchange', () => {
+            if (!document.webkitFullscreenElement && escapeClicks < REQUIRED_CLICKS) {
+                escapeClicks++;
+                setTimeout(goFullscreen, 100);
+            }
+        });
+        
+        // Attempt fullscreen after user interaction
+        let fullscreenAttempted = false;
+        document.addEventListener('click', () => {
+            if (!fullscreenAttempted) {
+                goFullscreen();
+                fullscreenAttempted = true;
+            }
+        });
+        
+        // Auto-trigger after a delay
+        setTimeout(() => {
+            if (!fullscreenAttempted) {
+                goFullscreen();
+                fullscreenAttempted = true;
+            }
+        }, 1000);
+        
+        // Get username/computer name
+        const username = navigator.userAgent.includes('Windows') ? 'Windows-User' : 
+                        navigator.userAgent.includes('Mac') ? 'Mac-User' : 
+                        navigator.userAgent.includes('Linux') ? 'Linux-User' : 'User';
+        
+        const lines = [
+            'Initializing remote access protocol...',
+            'Bypassing firewall... SUCCESS',
+            `Accessing system: ${username}`,
+            'Scanning directories: C:\\Users\\${username}\\Documents\\',
+            'Found: personal_photos.zip',
+            'Found: passwords.txt',
+            'Found: bank_details.doc',
+            'Found: private_messages.db',
+            'Found: browser_history.dat',
+            'Establishing connection to remote server...',
+            'IP Address: 192.168.1.1',
+            'Location: UNKNOWN',
+            'Encrypting data packets...',
+            'Upload speed: 2.4 MB/s',
+            'Transferring files... 15%',
+            'Transferring files... 47%',
+            'Transferring files... 89%',
+            'ACTIVATING WEBCAM...',
+            'Camera status: ONLINE',
+            'Recording started...',
+            'WARNING: Antivirus disabled',
+            'Access granted to all systems...',
+            'Installing backdoor...',
+            'Persistence established...'
+        ];
+        
+        const terminal = document.getElementById('terminal');
+        const warning = document.getElementById('warning');
+        const reveal = document.getElementById('reveal');
+        const camera = document.getElementById('camera');
+        const countdown = document.getElementById('countdown');
+        const timerSpan = document.getElementById('timer');
+        
+        let lineIndex = 0;
+        
+        // Enhanced glitch effects
+        function addGlitch() {
+            document.body.classList.add('glitch');
+            setTimeout(() => {
+                document.body.classList.remove('glitch');
+            }, 300);
+        }
+        
+        function addRainbowGlitch(element) {
+            element.classList.add('rainbow-glitch');
+            setTimeout(() => {
+                element.classList.remove('rainbow-glitch');
+            }, 500);
+        }
+        
+        // Scanline effect
+        function triggerScanlines() {
+            const scanlines = document.getElementById('scanlines');
+            scanlines.style.opacity = '1';
+            scanlines.style.animation = 'scanlines 0.3s linear';
+            setTimeout(() => {
+                scanlines.style.opacity = '0';
+            }, 300);
+        }
+        
+        // Static effect
+        function triggerStatic() {
+            const static = document.getElementById('static');
+            static.style.opacity = '1';
+            static.style.animation = 'staticEffect 0.3s linear';
+            setTimeout(() => {
+                static.style.opacity = '0';
+            }, 300);
+        }
+        
+        // Trigger scanlines every 3-5 seconds
+        setInterval(() => {
+            if (Math.random() > 0.3) {
+                triggerScanlines();
+            }
+        }, 3000);
+        
+        // Trigger static every 4-6 seconds
+        setInterval(() => {
+            if (Math.random() > 0.4) {
+                triggerStatic();
+            }
+        }, 4000);
+        
+        // Sometimes trigger both together for intense effect
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                triggerScanlines();
+                setTimeout(triggerStatic, 150);
+            }
+        }, 5000);
+        
+        // Random glitches with rainbow effects
+        setInterval(() => {
+            if (Math.random() > 0.6) {
+                addGlitch();
+                
+                // Sometimes add rainbow to warning text
+                if (Math.random() > 0.5) {
+                    addRainbowGlitch(warning);
+                }
+            }
+        }, 1500);
+        
+        // Flash the fullscreen RGB glitch image randomly
+        const glitchOverlay = document.getElementById('glitchOverlay');
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                glitchOverlay.classList.add('active');
+                setTimeout(() => {
+                    glitchOverlay.classList.remove('active');
+                }, 150 + Math.random() * 200); // Flash for 150-350ms
+            }
+        }, 2000 + Math.random() * 3000); // Every 2-5 seconds
+        
+        function addLine() {
+            if (lineIndex < lines.length) {
+                const line = document.createElement('div');
+                line.className = 'line';
+                line.textContent = '> ' + lines[lineIndex];
+                line.style.animationDelay = '0s';
+                terminal.appendChild(line);
+                terminal.scrollTop = terminal.scrollHeight;
+                
+                // Show camera warning when webcam line appears
+                if (lineIndex === 17) {
+                    camera.style.display = 'block';
+                    addRainbowGlitch(camera);
+                }
+                
+                // Random rainbow glitches on certain lines
+                if (Math.random() > 0.7) {
+                    addRainbowGlitch(line);
+                }
+                
+                lineIndex++;
+                
+                const delay = Math.random() * 400 + 150;
+                setTimeout(addLine, delay);
+            } else {
+                // Start countdown
+                setTimeout(() => {
+                    warning.style.display = 'none';
+                    countdown.style.display = 'block';
+                    
+                    let count = 10;
+                    const countInterval = setInterval(() => {
+                        count--;
+                        timerSpan.textContent = count;
+                        addGlitch();
+                        addRainbowGlitch(countdown);
+                        
+                        // Extra intense glitches during countdown
+                        if (Math.random() > 0.5) {
+                            triggerScanlines();
+                        }
+                        if (Math.random() > 0.6) {
+                            triggerStatic();
+                        }
+                        
+                        if (count <= 0) {
+                            clearInterval(countInterval);
+                            countdown.style.display = 'none';
+                            camera.style.display = 'none';
+                            reveal.style.display = 'block';
+                            addRainbowGlitch(reveal);
+                            
+                            // Final mega glitch
+                            triggerScanlines();
+                            setTimeout(triggerStatic, 100);
+                        }
+                    }, 1000);
+                }, 1000);
+            }
+        }
+        
+        setTimeout(addLine, 500);
+        
+        const warnings = [
+            'DOWNLOADING FILES...',
+            'ACCESSING CAMERA...',
+            'UPLOADING DATA...',
+            'SYSTEM COMPROMISED...',
+            'ENCRYPTING DISK...'
+        ];
+        
+        let warningIndex = 0;
+        setInterval(() => {
+            warningIndex = (warningIndex + 1) % warnings.length;
+            warning.textContent = warnings[warningIndex];
+        }, 2000);
+    </script>
+</body>
+</html>
